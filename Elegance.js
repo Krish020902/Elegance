@@ -78,10 +78,39 @@ app.post("/add_user", async (req, res) => {
 });
 
 // Route to handle GET requests to retrieve all users
+// Route to handle GET requests to retrieve all users sorted by entry time
 app.get("/get_users", async (req, res) => {
   try {
+    // Find all users
     const users = await User.find();
+
+    // Sort the users by entry time
+    users.sort((a, b) => {
+      // Extract the entry times from the users
+      const timeA = a.entry_time;
+      const timeB = b.entry_time;
+
+      // Compare the entry times directly as strings
+      if (timeA < timeB) {
+        return -1;
+      }
+      if (timeA > timeB) {
+        return 1;
+      }
+      return 0;
+    });
+
     return res.json(users);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete("/delete_users", async (req, res) => {
+  try {
+    // Delete all documents from the User collection
+    await User.deleteMany({});
+    return res.status(200).json({ message: "All users deleted successfully" });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

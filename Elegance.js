@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const app = express();
 
@@ -31,8 +32,12 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Allow requests from localhost:3000
+  })
+);
 
-// Route to handle POST requests for adding user information
 // Route to handle POST requests for adding user information
 app.post("/add_user", async (req, res) => {
   try {
@@ -78,34 +83,15 @@ app.post("/add_user", async (req, res) => {
 });
 
 // Route to handle GET requests to retrieve all users
-// Route to handle GET requests to retrieve all users sorted by entry time
 app.get("/get_users", async (req, res) => {
   try {
-    // Find all users
-    const users = await User.find();
-
-    // Sort the users by entry time
-    users.sort((a, b) => {
-      // Extract the entry times from the users
-      const timeA = a.entry_time;
-      const timeB = b.entry_time;
-
-      // Compare the entry times directly as strings
-      if (timeA < timeB) {
-        return -1;
-      }
-      if (timeA > timeB) {
-        return 1;
-      }
-      return 0;
-    });
-
+    // Retrieve users from the database and sort them by entry_time in ascending order
+    const users = await User.find().sort({ entry_time: 1 });
     return res.json(users);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 });
-
 app.delete("/delete_users", async (req, res) => {
   try {
     // Delete all documents from the User collection
@@ -116,7 +102,7 @@ app.delete("/delete_users", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

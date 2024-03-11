@@ -34,7 +34,7 @@ const User = mongoose.model("User", userSchema);
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:3000", // Allow requests from localhost:3000
+    origin: "*", // Allow requests from any origin
   })
 );
 
@@ -92,6 +92,7 @@ app.get("/get_users", async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 });
+
 app.delete("/delete_users", async (req, res) => {
   try {
     // Delete all documents from the User collection
